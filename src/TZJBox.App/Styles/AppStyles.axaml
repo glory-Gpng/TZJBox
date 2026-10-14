@@ -1,0 +1,79 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style Selector="TextBlock.h1">
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="#F4F1EA" />
+    </Style>
+    <Style Selector="TextBlock.muted">
+        <Setter Property="Foreground" Value="#9AA3B2" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector="TextBlock.section">
+        <Setter Property="Foreground" Value="#C8D0DC" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Border.panel">
+        <Setter Property="Background" Value="#1A1F27" />
+        <Setter Property="BorderBrush" Value="#2C3440" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="12" />
+    </Style>
+    <Style Selector="Button.mode">
+        <Setter Property="Background" Value="#222833" />
+        <Setter Property="Foreground" Value="#D5DBE6" />
+        <Setter Property="BorderBrush" Value="#343D4C" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,7" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Margin" Value="0,0,8,8" />
+    </Style>
+    <Style Selector="Button.mode:pointerover">
+        <Setter Property="Background" Value="#2C3442" />
+    </Style>
+    <Style Selector="Button.mode.selected">
+        <Setter Property="Background" Value="#3A2C18" />
+        <Setter Property="BorderBrush" Value="#E09A4E" />
+        <Setter Property="Foreground" Value="#F6E2C4" />
+    </Style>
+    <Style Selector="Button.mode.selected:pointerover">
+        <Setter Property="Background" Value="#4A381C" />
+    </Style>
+    <Style Selector="Button.primary">
+        <Setter Property="Background" Value="#E09A4E" />
+        <Setter Property="Foreground" Value="#1B1308" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="CornerRadius" Value="8" />
+    </Style>
+    <Style Selector="Button.primary:pointerover">
+        <Setter Property="Background" Value="#F0B56A" />
+    </Style>
+    <Style Selector="Button.primary:disabled">
+        <Setter Property="Opacity" Value="0.45" />
+    </Style>
+    <Style Selector="TextBlock.hit">
+        <Setter Property="Background" Value="#E09A4E" />
+        <Setter Property="Foreground" Value="#1B1308" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="2,0" />
+    </Style>
+    <Style Selector="TextBlock.proposed">
+        <Setter Property="Foreground" Value="#9AA3B2" />
+    </Style>
+    <Style Selector="TextBlock.proposed.changed">
+        <Setter Property="Foreground" Value="#F0C27A" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="ListBox.files">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="ListBox.files ListBoxItem">
+        <Setter Property="Padding" Value="8,7" />
+        <Setter Property="Margin" Value="0,0,0,2" />
+        <Setter Property="CornerRadius" Value="6" />
+    </Style>
+</Styles>

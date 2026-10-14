@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sort="using:TZJBox.Sorting"
+        x:Class="TZJBox.App.Views.RenamePreviewWindow"
+        Title="确认规范化重命名"
+        Width="680"
+        Height="540"
+        MinWidth="520"
+        MinHeight="360"
+        Background="#121417"
+        WindowStartupLocation="CenterOwner"
+        FontFamily="Inter, Microsoft YaHei UI, Microsoft YaHei, Noto Sans CJK SC, WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">
+    <Grid Margin="18" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
+        <TextBlock x:Name="TitleText" Classes="h1" Text="确认重命名" />
+        <TextBlock Grid.Row="1" Classes="muted" TextWrapping="Wrap"
+                   Text="先改成临时名，再改成最终名，避免新旧文件名互相覆盖。已经是目标名的文件不会动。外部看图软件之后会按这个新名字排序。" />
+        <ListBox x:Name="ChangeList" Grid.Row="2" Background="Transparent" BorderThickness="0">
+            <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="sort:RenamePlanItem">
+                    <Grid ColumnDefinitions="*,Auto,*">
+                        <TextBlock Text="{Binding SourceFileName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Text="→" Margin="10,0" Foreground="#E09A4E" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Text="{Binding ProposedFileName}" Foreground="#F0C27A" VerticalAlignment="Center" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="取消" Click="OnCancel" IsCancel="True" />
+            <Button Classes="primary" Content="开始重命名" Click="OnConfirm" IsDefault="True" />
+        </StackPanel>
+    </Grid>
+</Window>
