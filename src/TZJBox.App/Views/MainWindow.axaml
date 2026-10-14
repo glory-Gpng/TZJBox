@@ -1,0 +1,185 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TZJBox.App.ViewModels"
+        xmlns:sort="using:TZJBox.Sorting"
+        xmlns:conv="using:Avalonia.Data.Converters"
+        x:Class="TZJBox.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="TZJBox 图片排序"
+        Width="1180"
+        Height="800"
+        MinWidth="960"
+        MinHeight="640"
+        Background="#121417"
+        FontFamily="Inter, Microsoft YaHei UI, Microsoft YaHei, Noto Sans CJK SC, Source Han Sans SC, WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="18" RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
+        <Grid ColumnDefinitions="Auto,*">
+            <Border Width="42" Height="42" CornerRadius="10" Background="#E09A4E" VerticalAlignment="Center">
+                <TextBlock Text="TZ" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="#1B1308" FontWeight="Bold" FontSize="16" />
+            </Border>
+            <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center" Spacing="2">
+                <TextBlock Classes="h1" Text="图片排序" />
+                <TextBlock Classes="muted" Text="伪前缀不再抢走真序号。琥珀色是这次实际拿来排序的数字。" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
+            <TextBox PlaceholderText="图片文件夹路径，回车读取；也可以把文件夹拖进窗口"
+                     Text="{Binding FolderPath, Mode=TwoWay}"
+                     KeyDown="OnFolderKeyDown"
+                     VerticalAlignment="Center" />
+            <Button Grid.Column="1" Content="浏览" Command="{Binding BrowseCommand}" />
+            <Button Grid.Column="2" Content="刷新" Command="{Binding LoadFolderCommand}" />
+            <Button Grid.Column="3" Content="打开文件夹" Command="{Binding RevealFolderCommand}" />
+        </Grid>
+
+        <Border Grid.Row="2" Classes="panel">
+            <StackPanel Spacing="10">
+                <ItemsControl ItemsSource="{Binding Strategies}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:StrategyChoice">
+                            <Button Classes="mode"
+                                    Classes.selected="{Binding IsSelected}"
+                                    Content="{Binding Title}"
+                                    Command="{Binding SelectCommand}"
+                                    ToolTip.Tip="{Binding Description}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Classes="muted" Text="{Binding StrategyDescription}" TextWrapping="Wrap" />
+
+                <WrapPanel Orientation="Horizontal">
+                    <CheckBox Content="剔除分辨率" IsChecked="{Binding StripResolution, Mode=TwoWay}" Margin="0,0,16,8"
+                              IsVisible="{Binding ShowNoiseOptions}" />
+                    <CheckBox Content="剔除日期和长编号" IsChecked="{Binding StripDatesAndLongIds, Mode=TwoWay}" Margin="0,0,16,8"
+                              IsVisible="{Binding ShowNoiseOptions}" />
+                    <CheckBox Content="忽略全文件夹相同的数字段" IsChecked="{Binding IgnoreConstantSegments, Mode=TwoWay}" Margin="0,0,16,8"
+                              IsVisible="{Binding ShowNoiseOptions}" />
+                    <CheckBox Content="只看图片" IsChecked="{Binding ImagesOnly, Mode=TwoWay}" Margin="0,0,16,8" />
+                    <CheckBox Content="降序" IsChecked="{Binding Descending, Mode=TwoWay}" Margin="0,0,16,8" />
+                </WrapPanel>
+
+                <Grid ColumnDefinitions="Auto,80,Auto,70,Auto,*" ColumnSpacing="8"
+                      IsVisible="{Binding ShowPrefixOptions}">
+                    <TextBlock VerticalAlignment="Center" Text="分隔符" />
+                    <TextBox Grid.Column="1" Text="{Binding PrefixDelimiter, Mode=TwoWay}" />
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="跳过前几个" />
+                    <ComboBox Grid.Column="3" Width="72" ItemsSource="{Binding SkipCounts}"
+                          SelectedItem="{Binding PrefixSkipCount, Mode=TwoWay}" />
+                    <TextBlock Grid.Column="4" VerticalAlignment="Center" Classes="muted"
+                               Text="例如跳过 1 个 _ 后，001_02_正文10 会按 02_正文10 排序。" />
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" IsVisible="{Binding ShowRegexOptions}">
+                    <TextBox PlaceholderText="按完整文件名匹配，例如 ^\d+_(\d+)"
+                             Text="{Binding CustomPattern, Mode=TwoWay}" />
+                    <CheckBox Grid.Column="1" Content="忽略大小写" IsChecked="{Binding RegexIgnoreCase, Mode=TwoWay}"
+                              VerticalAlignment="Center" />
+                </Grid>
+                <TextBlock Foreground="#E07A7A" Text="{Binding PatternError}"
+                           IsVisible="{Binding PatternError, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}"
+                           TextWrapping="Wrap" />
+
+                <TextBlock Classes="muted" TextWrapping="Wrap" IsVisible="{Binding ShowMetadataHint}"
+                           Text="优先使用 EXIF 的 DateTimeOriginal。没有拍摄时间时用文件修改时间。不会使用创建时间，因为创建时间往往就是下载完成的顺序。" />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="3" ColumnDefinitions="*,300" ColumnSpacing="12">
+            <Border Classes="panel" Padding="8">
+                <DockPanel>
+                    <Grid DockPanel.Dock="Top" ColumnDefinitions="44,*,110,120,210" Margin="8,4,24,6">
+                        <TextBlock Classes="section" Text="#" />
+                        <TextBlock Grid.Column="1" Classes="section" Text="文件名" />
+                        <TextBlock Grid.Column="2" Classes="section" Text="排序键" />
+                        <TextBlock Grid.Column="3" Classes="section" Text="规范化名称" />
+                        <TextBlock Grid.Column="4" Classes="section" Text="说明" />
+                    </Grid>
+                    <TextBox DockPanel.Dock="Top" Margin="4,0,4,8"
+                             PlaceholderText="在当前结果里筛选文件名"
+                             Text="{Binding NameFilter, Mode=TwoWay}" />
+                    <Panel>
+                        <ListBox Classes="files" ItemsSource="{Binding VisibleFiles}"
+                                 SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
+                                 DoubleTapped="OnListDoubleTapped">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:FileRowViewModel">
+                                    <Grid ColumnDefinitions="44,*,110,120,210">
+                                        <TextBlock Text="{Binding Index}" Foreground="#9AA3B2" VerticalAlignment="Center" />
+                                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Spans}" VerticalAlignment="Center">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="sort:NameSpan">
+                                                    <TextBlock Text="{Binding Text}"
+                                                               Classes.hit="{Binding Highlight}"
+                                                               VerticalAlignment="Center" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                        <TextBlock Grid.Column="2" Text="{Binding KeyLabel}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="3" Text="{Binding ProposedName}" VerticalAlignment="Center"
+                                                   Classes="proposed" Classes.changed="{Binding NameChanges}" />
+                                        <TextBlock Grid.Column="4" Text="{Binding Explanation}" VerticalAlignment="Center"
+                                                   Foreground="#9AA3B2" TextTrimming="CharacterEllipsis" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <TextBlock Text="{Binding EmptyHint}" Classes="muted" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" IsVisible="{Binding !HasVisibleFiles}" />
+                    </Panel>
+                </DockPanel>
+            </Border>
+
+            <Border Grid.Column="1" Classes="panel">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Classes="section" Text="预览" Margin="0,0,0,8" />
+                    <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,10,0,0">
+                        <TextBlock Classes="muted" Text="{Binding SelectedFile.FileName}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding SelectedFile.Explanation}" TextWrapping="Wrap" />
+                        <TextBlock Classes="muted" Text="{Binding SelectedFile.ProposedName, StringFormat=将命名为 {0}}" />
+                        <TextBlock Classes="muted" Text="{Binding SelectedFile.ExifText, StringFormat=拍摄时间 {0}}" />
+                        <TextBlock Classes="muted" Text="{Binding SelectedFile.WriteText, StringFormat=修改时间 {0}}" />
+                        <TextBlock Classes="muted" Text="双击列表用系统看图打开。" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Panel>
+                        <Image Source="{Binding Preview}" Stretch="Uniform" />
+                        <TextBlock Text="{Binding PreviewHint}" Classes="muted" TextWrapping="Wrap"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsVisible="{Binding Preview, Converter={x:Static conv:ObjectConverters.IsNull}}" />
+                    </Panel>
+                </DockPanel>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="4" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
+            <StackPanel Spacing="2" VerticalAlignment="Center">
+                <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" />
+                <TextBlock Classes="muted" Text="{Binding RenameHint}" TextWrapping="Wrap" />
+            </StackPanel>
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="补零位数" />
+            <ComboBox Grid.Column="2" Width="72" ItemsSource="{Binding PadWidths}"
+                      SelectedItem="{Binding RenamePadWidth, Mode=TwoWay}" VerticalAlignment="Center" />
+            <Button Grid.Column="3" Classes="primary" Content="{Binding RenameButtonText}"
+                    Command="{Binding RenameCommand}" VerticalAlignment="Center" />
+        </Grid>
+
+        <Border Grid.RowSpan="5" Background="#AA121417" IsVisible="{Binding IsBusy}" IsHitTestVisible="True">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                <ProgressBar IsIndeterminate="True" Width="220" />
+                <TextBlock Text="{Binding StatusText}" HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
