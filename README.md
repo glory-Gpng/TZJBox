@@ -4,7 +4,7 @@
 
 ## 运行
 
-需要 .NET 10 SDK。
+需要 .NET 9 SDK。
 
 ```bash
 dotnet run --project src/TZJBox.App
